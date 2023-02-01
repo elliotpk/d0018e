@@ -2,6 +2,8 @@ from flask import Flask, render_template
 import mysql.connector
 
 app = Flask(__name__)
+
+#create the connection to the database
 mydb = mysql.connector.connect(
     host="localhost",
     user="elliot",
