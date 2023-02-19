@@ -29,8 +29,7 @@ def login():
     form = login_form()
     if form.validate_on_submit():
         try:
-            user = get_user(form.username.data)
-            print(user)
+            user = get_user(form.email.data)
             if bcrypt.check_password_hash(user.password, form.pwd.data):
                 login_user(user)
                 return redirect(url_for('home'))
@@ -45,7 +44,21 @@ def login():
 
 @app.route('/register/', methods=("GET", "POST"))
 def register():
-    return('')
+    form = register_form()
+    if form.validate_on_submit():
+        try:
+            email = form.email.data
+            pwd = form.pwd.data
+            if(validate_email(email) != 0):
+                raise Exception("Email already exists")
+            newUser = User(None, email, bcrypt.generate_password_hash(pwd))
+            add_user(newUser)
+            flash("Account Created!", "success")
+            return redirect(url_for('login'))
+        except Exception as e:
+            flash(e, "danger")
+
+    return render_template('login.html', form=form, text='Register', btn_action='Submit')
 
 @login_manager.user_loader
 def load_user(user_id):

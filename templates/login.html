@@ -27,29 +27,10 @@ content%}
         <div class="text-center">
           <h2 class="text-primary text-white">{{ text }}</h2>
         </div>
-
-        {% if request.path == '/register/' %}
         <div class="form-group mb-3">
-          {{ form.username(class_="form-control",placeholder="Username")}}
+          {{ form.email(class_="form-control",placeholder="Email")}}
         </div>
-        {% for error in form.username.errors %}
-        <div
-          class="alert alert-warning alert-dismissible fade show"
-          role="alert"
-        >
-          {{ error }}
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="alert"
-            aria-label="Close"
-          ></button>
-        </div>
-        {% endfor%} {% endif%}
-        <div class="form-group mb-3">
-          {{ form.username(class_="form-control",placeholder="Username")}}
-        </div>
-        {% for error in form.username.errors %}
+        {% for error in form.email.errors %}
         <div
           class="alert alert-warning alert-dismissible fade show"
           role="alert"
@@ -113,7 +94,7 @@ content%}
               >Create account</a
             >
             {% else %} Already have an account?
-            <a href="{{url_for('login')}}">Login</a>
+            <a href="{{url_for('login')}}" class="link-info">Login</a>
             {% endif %}
           </p>
         </div>
