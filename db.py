@@ -6,7 +6,7 @@ from models import User
 mydb = mysql.connector.connect(
     host="192.168.1.209",
     user="elliotRemote",
-    password="6626",
+    password="",
     database="E-Commerce"
 )
 
