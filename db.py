@@ -13,21 +13,18 @@ mydb = mysql.connector.connect(
 def get_user(email):
     cursor=mydb.cursor()
     query = "SELECT id, hashed_pass FROM user WHERE email=%s"
-    cursor.execute(query, email)
+    cursor.execute(query, (email,))
     result = cursor.fetchone()
     return User(str(result[0]), email, result[1]) if result else None
 
 def add_user(user):
     cursor = mydb.cursor()
     query = "INSERT INTO user (email, hashed_pass) VALUES (%s, %s)"
-    print('hello')
     cursor.execute(query, (user.email, user.password))
-    print('executed statment')
     mydb.commit()
     query = "SELECT id FROM user WHERE email=%s"
     cursor.execute(query, (user.email,))
     result = cursor.fetchone()
-    print(result[0])
     user.setId = result[0]
 
 def validate_email(email):
