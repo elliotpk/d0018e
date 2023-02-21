@@ -1,3 +1,5 @@
+create file called "config.json"
+
 {
   "host": "IP HERE",
   "user": "USER HERE",
