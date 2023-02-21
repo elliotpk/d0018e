@@ -1,21 +1,29 @@
 import mysql.connector
 from models import User
+import json
 # Keep the database functions gathered somewhat in here
 
 #create the connection to the database
+with open("config.json", "r") as configfile:
+    data = json.load(configfile)
+
 mydb = mysql.connector.connect(
-    host="192.168.1.209",
-    user="elliotRemote",
-    password="",
-    database="E-Commerce"
+    host=data["host"],
+    user=data["user"],
+    password=data["password"],
+    database=data["database"]
 )
 
 def get_user(email):
     cursor=mydb.cursor()
-    query = "SELECT id, hashed_pass FROM user WHERE email=%s"
+    query = "SELECT id, email, hashed_pass FROM user WHERE email=%s"
     cursor.execute(query, (email,))
     result = cursor.fetchone()
-    return User(str(result[0]), email, result[1]) if result else None
+    if (result == None):
+        query = "SELECT id, email, hashed_pass FROM user WHERE id=%s"
+        cursor.execute(query, (email,))
+        result = cursor.fetchone()
+    return User(str(result[0]), result[1], result[2]) if result else None
 
 def add_user(user):
     cursor = mydb.cursor()

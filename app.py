@@ -35,11 +35,9 @@ def login():
                 return redirect(url_for('home'))
             else:
                 flash("Invalid username or password", "danger")
-        except Exception as e:
-            if(user == None):
-                flash("Invalid username or password", "danger")
-            else:               
+        except Exception as e:        
                 flash(e)
+
     return render_template("login.html", form=form, text='Login', btn_action='Login')
 
 @app.route('/register/', methods=("GET", "POST"))
@@ -59,6 +57,12 @@ def register():
             flash(e, "danger")
 
     return render_template('login.html', form=form, text='Register', btn_action='Submit')
+
+@app.route('/logout/', methods=("GET", "POST"))
+@login_required
+def logout():
+    logout_user()
+    return render_template("home.html")
 
 @login_manager.user_loader
 def load_user(user_id):
