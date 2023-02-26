@@ -24,6 +24,22 @@ bcrypt.init_app(app)
 def home():
     return render_template('home.html')
 
+@app.route('/account/')
+@login_required
+def account():
+    if(current_user.user_type == 'U'):
+        return render_template("account.html")
+    else:
+        return redirect(url_for('admin'))
+    
+@app.route('/admin/')
+@login_required
+def admin():
+    if(current_user.user_type != 'A'):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('home'))
+    return render_template("admin.html")
+
 @app.route('/login/', methods=("GET", "POST"))
 def login():
     form = login_form()

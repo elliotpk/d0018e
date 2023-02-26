@@ -16,14 +16,14 @@ mydb = mysql.connector.connect(
 
 def get_user(email):
     cursor=mydb.cursor()
-    query = "SELECT id, email, hashed_pass FROM user WHERE email=%s"
+    query = "SELECT id, email, hashed_pass, user_type FROM user WHERE email=%s"
     cursor.execute(query, (email,))
     result = cursor.fetchone()
     if (result == None):
-        query = "SELECT id, email, hashed_pass FROM user WHERE id=%s"
+        query = "SELECT id, email, hashed_pass, user_type FROM user WHERE id=%s"
         cursor.execute(query, (email,))
         result = cursor.fetchone()
-    return User(str(result[0]), result[1], result[2]) if result else None
+    return User(str(result[0]), result[1], result[2], result[3]) if result else None
 
 def add_user(user):
     cursor = mydb.cursor()
