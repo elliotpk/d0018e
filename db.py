@@ -41,3 +41,11 @@ def validate_email(email):
     cursor.execute(query, (email,))
     result = cursor.fetchall()
     return result[0][0]                                            # Returns 0 if no user exists with that email
+
+def getItems():
+    """Get all active listings for items"""
+    cursor=mydb.cursor()
+    query="SELECT listing.`date`, item.`name`, item.`image`, item.`price` FROM listing JOIN item WHERE item.`id` = `item:id` AND listing.`active` = 1"   # can remove listing.`item:id` from select
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
