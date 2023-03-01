@@ -1,4 +1,4 @@
-create file called "config.json"
+create file called "config.json" containing:
 
 {
   "host": "IP HERE",
