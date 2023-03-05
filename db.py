@@ -48,4 +48,5 @@ def getItems():
     query="SELECT listing.`date`, item.`name`, item.`image`, item.`price` FROM listing JOIN item WHERE item.`id` = `item:id` AND listing.`active` = 1"   # can remove listing.`item:id` from select
     cursor.execute(query)
     result = cursor.fetchall()
+    print(result)
     return result

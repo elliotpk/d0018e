@@ -23,7 +23,6 @@ bcrypt.init_app(app)
 @app.route('/')
 def home():
     itemdata = getItems()
-    print(itemdata)
     return render_template('home.html', items = itemdata) # todo: get database info for each item and format properly
 
 @app.route('/account/')
@@ -67,7 +66,7 @@ def register():
             pwd = form.pwd.data
             if(validate_email(email) != 0):
                 raise Exception("Email already exists")
-            newUser = User(None, email, bcrypt.generate_password_hash(pwd))
+            newUser = User(None, email, bcrypt.generate_password_hash(pwd), 'U')
             add_user(newUser)
             flash("Account Created!", "success")
             return redirect(url_for('login'))
