@@ -48,7 +48,7 @@ def getItems():
     query="SELECT listing.`date`, item.`name`, item.`image`, item.`price`, item.`id`, item.`description` FROM listing JOIN item WHERE item.`id` = `item:id` AND listing.`active` = 1"   # can remove listing.`item:id` from select
     cursor.execute(query)
     result = cursor.fetchall()
-    print(result)
+    cursor.close()
     return result
 
 def createItems(name,img,price,description):
@@ -56,15 +56,15 @@ def createItems(name,img,price,description):
         cursor=mydb.cursor()
         query="INSERT INTO item (name, image, price, description) VALUES (%s, %s, %s, %s)"
         values = (name,img,int(price),description)
-        cursor.execute(query,values)
+        cursor.execute(query,(values))
         mydb.commit()
         query="SELECT id FROM item WHERE name = %s"
-        cursor.execute(query,name)
+        cursor.execute(query,(name,))
         itemid=cursor.fetchone()
-        print(itemid)
+        cursor.close()
         return itemid
     except mysql.connector.DatabaseError as e:
-        print(e)
+        print(e,"create item")
 
 def createAttribute(attname):
     try:
@@ -73,22 +73,26 @@ def createAttribute(attname):
         values = ([attname])
         cursor.execute(query,values)
         mydb.commit()
+        cursor.close()
     except Exception as e:
         print(e,"createa")
 
 def createAttributeValue(attvalue,attid,id):
     try:
         cursor=mydb.cursor()
-        query = "SELECT * FROM attributes WHERE name = %s"
-        temp = attid
-        for x in attid:
-            cursor.execute(query,x)
-            temp = cursor.fetchone()[0]
-        query="INSERT INTO attribute_value (value,item:id,attributes:id) VALUES (%s, %s, %s)"
-        for x in attvalue:
-            values = (x,id,temp[x])
-            cursor.execute(query,values)
+        query = "SELECT id FROM attributes WHERE name = %s"
+        query2 = "INSERT INTO attribute_value (value,item:id,attributes:id) VALUES (%s, %s, %s)"
+        tempid=[]
+        for x in attid[0]:
+            cursor.execute(query,(x,))
+            row = cursor.fetchone()
+            if row is not None:
+                tempid.append(row[0])
+        for x in range(len(attvalue)):
+            cursor.execute(query2,(attvalue[x],tempid[x],id))
             mydb.commit()
+        cursor.close()
+
     except Exception as e:
         print(e,"creatval")
 
@@ -98,6 +102,7 @@ def getAttributes():
         query="SELECT DISTINCT `name` FROM attributes"
         cursor.execute(query)
         result=cursor.fetchall()
+        cursor.close()
         return result
     except Exception as e:
         print(e,"getatt")

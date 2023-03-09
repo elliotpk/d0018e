@@ -40,7 +40,6 @@ def admin():
         flash("Unauthorized access", "danger")
         return redirect(url_for('home'))
     try:
-        print(session)
         session['attributevalue']=[]
         session['selctedattlist']=[]
     except Exception as e:
@@ -82,31 +81,29 @@ def addItem():
                 if description  == "":
                     description  = "None"
                 id=createItems(name,image,price,description)
-                attributevalue = request.form.getlist('attribute')
-                createAttributeValue(attributevalue, request.form.getlist('selctedattlist'),id)
-                session.popitem('selctedattlist')
-                session.popitem('attributevalue')
+                createAttributeValue(session['attributevalue'], session['selctedattlist'],id)
+                session['attributevalue'] = []
+                session['selctedattlist'] = []
             except Exception as e:
-                flash(e)
+                print(e,"newitem")
     elif action == 'createattribute':
         if attform.validate_on_submit():
             try:
                 attributename = attform.attributename.data
                 createAttribute(attributename)
             except Exception as e:
-                print(e)
+                print(e,"createattribute")
     elif action == 'createvalue':
         if attvalform.validate_on_submit():
             try:
                 if request.form.getlist('attributevalue') != 0:
                     tre = request.form.getlist('attributevalue')
-                    for x in request.form.getlist('attributevalue'):
-                        attributevalue.append(x)
+                    attributevalue=request.form.getlist('attributevalue')
                     session['attributevalue']=attributevalue
                 else:
                     attributevalue=session['attributevalue']
             except Exception as e:
-                print(e)
+                print(e,"createvalue")
     elif action == 'selectattribute':
         if len(request.form.getlist('attribute')) != 0:
             data = request.form.getlist('attribute')
