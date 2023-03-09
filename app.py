@@ -50,7 +50,7 @@ def admin():
             createItems(name,image,price,description,attid)
         except Exception as e:
             flash(e)
-    return render_template("admin.html", form=form)
+    return render_template("admin.html", form=form) #Här är error vet inte vad som saknas
 
 @app.route('/admin/addItem/', methods=("GET","POST"))
 @login_required
