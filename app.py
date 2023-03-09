@@ -121,6 +121,21 @@ def addItem():
     print(session['attributevalue'],attributevalue)
     return render_template("addItem.html", form=form, attform=attform, attlist=attlist, attvalform=attvalform, selctedattlist=selctedattlist, attributevalue=attributevalue)
 
+@app.route('/item/<id>', methods=["GET"])
+def item(id):
+    return id
+
+@app.route('/delist/<id>', methods=['POST'])
+@login_required
+def delist(id):
+    if(current_user.user_type != 'A'):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('home'))
+    itemid = id
+    # TODO Add database connection to delist the item, also make sure to fetch delisted items and display them to the admin
+    return redirect(url_for('home'))
+
+
 @app.route('/login/', methods=("GET", "POST"))
 def login():
     form = login_form()
