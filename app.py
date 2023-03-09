@@ -41,7 +41,7 @@ def admin():
         return redirect(url_for('home'))
     try:
         session['attributevalue']=[]
-        session['selctedattlist']=[]
+        session['selectedattlist']=[]
     except Exception as e:
         print(e)
     form = addItem_form
@@ -58,9 +58,9 @@ def addItem():
     attform = addAttribute_form()
     attvalform = addAttributeValue_form()
     try:
-        selctedattlist = session['selctedattlist']
+        selectedattlist = session['selectedattlist']
     except:
-        session['selctedattlist'] = selctedattlist=[]
+        session['selectedattlist'] = selectedattlist=[]
     try:
         attributevalue=session['attributevalue']
     except:
@@ -71,7 +71,6 @@ def addItem():
         action = None
     if action == 'newitem':
         if form.validate_on_submit():
-            try:
                 name = form.name.data
                 image = form.image.data
                 price = form.price.data
@@ -81,11 +80,10 @@ def addItem():
                 if description  == "":
                     description  = "None"
                 id=createItems(name,image,price,description)
-                createAttributeValue(session['attributevalue'], session['selctedattlist'],id)
-                session['attributevalue'] = []
-                session['selctedattlist'] = []
-            except Exception as e:
-                print(e,"newitem")
+                if(len(session['attributevalue']) > 0 and len(session['selectedattlist']) > 0):
+                    createAttributeValue(session['attributevalue'], session['selectedattlist'],id)
+                    session['attributevalue'] = []
+                    session['selectedattlist'] = []
     elif action == 'createattribute':
         if attform.validate_on_submit():
             try:
@@ -109,14 +107,14 @@ def addItem():
             data = request.form.getlist('attribute')
             for x in range(len(data)):
                 data[x]=data[x].split("('")[1].split("',)")[0]
-                selctedattlist = data
-            session['selctedattlist']=selctedattlist
+                selectedattlist = data
+            session['selectedattlist']=selectedattlist
         else:
-            selctedattlist=session['selctedattlist']
+            selectedattlist=session['selectedattlist']
     attlist = getAttributes()
-    print(session['selctedattlist'],selctedattlist)
+    print(session['selectedattlist'],selectedattlist)
     print(session['attributevalue'],attributevalue)
-    return render_template("addItem.html", form=form, attform=attform, attlist=attlist, attvalform=attvalform, selctedattlist=selctedattlist, attributevalue=attributevalue)
+    return render_template("addItem.html", form=form, attform=attform, attlist=attlist, attvalform=attvalform, selectedattlist=selectedattlist, attributevalue=attributevalue)
 
 @app.route('/item/<id>', methods=["GET"])
 def item(id):

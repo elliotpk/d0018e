@@ -1,6 +1,7 @@
 import mysql.connector
 from models import User
 import json
+from datetime import datetime
 # Keep the database functions gathered somewhat in here
 
 #create the connection to the database
@@ -23,6 +24,7 @@ def get_user(email):
         query = "SELECT id, email, hashed_pass, user_type FROM user WHERE id=%s"
         cursor.execute(query, (email,))
         result = cursor.fetchone()
+    cursor.close()
     return User(str(result[0]), result[1], result[2], result[3]) if result else None
 
 def add_user(user):
@@ -33,6 +35,7 @@ def add_user(user):
     query = "SELECT id FROM user WHERE email=%s"
     cursor.execute(query, (user.email,))
     result = cursor.fetchone()
+    cursor.close()
     user.setId = result[0]
 
 def validate_email(email):
@@ -40,6 +43,7 @@ def validate_email(email):
     query="SELECT EXISTS(SELECT * FROM user WHERE email = %s)"
     cursor.execute(query, (email,))
     result = cursor.fetchall()
+    cursor.close()
     return result[0][0]                                            # Returns 0 if no user exists with that email
 
 def getItems():
@@ -53,14 +57,19 @@ def getItems():
 
 def createItems(name,img,price,description):
     try:
-        cursor=mydb.cursor()
+        cursor=mydb.cursor(buffered=True)
         query="INSERT INTO item (name, image, price, description) VALUES (%s, %s, %s, %s)"
         values = (name,img,int(price),description)
         cursor.execute(query,(values))
         mydb.commit()
-        query="SELECT id FROM item WHERE name = %s"
-        cursor.execute(query,(name,))
-        itemid=cursor.fetchone()
+        query="SELECT LAST_INSERT_ID()"
+        cursor.execute(query)
+        itemid=cursor.fetchone()[0]
+        query="INSERT INTO listing (active, `item:id`, date) VALUES (%s, %s, %s)"
+        current_time = datetime.now()
+        time = current_time.strftime("%Y-%m-%d")
+        cursor.execute(query, (1, itemid, time))
+        mydb.commit()
         cursor.close()
         return itemid
     except mysql.connector.DatabaseError as e:
@@ -78,23 +87,21 @@ def createAttribute(attname):
         print(e,"createa")
 
 def createAttributeValue(attvalue,attid,id):
-    try:
         cursor=mydb.cursor()
         query = "SELECT id FROM attributes WHERE name = %s"
-        query2 = "INSERT INTO attribute_value (value,item:id,attributes:id) VALUES (%s, %s, %s)"
+        query2 = "INSERT INTO attribute_value (value,`item:id`,`attributes:id`) VALUES (%s, %s, %s)"
         tempid=[]
-        for x in attid[0]:
-            cursor.execute(query,(x,))
-            row = cursor.fetchone()
-            if row is not None:
-                tempid.append(row[0])
-        for x in range(len(attvalue)):
-            cursor.execute(query2,(attvalue[x],tempid[x],id))
-            mydb.commit()
-        cursor.close()
-
-    except Exception as e:
-        print(e,"creatval")
+        while(len(attid)>0):
+            cursor.execute(query, (attid.pop(0),))
+            res = cursor.fetchall()
+            for var in res:
+                tempid.append(var[0])
+        data = []
+        for i in range(len(tempid)):
+            data.append((attvalue[i], id, tempid[i]))
+        
+        cursor.executemany(query2, data)
+        mydb.commit()
 
 def getAttributes():
     try:
