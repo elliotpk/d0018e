@@ -1,0 +1,84 @@
+{% extends "index.html" %} {% block title %}Admin Page{% endblock %} {% block
+content %}
+
+<body>
+    <form action="{{url_for('addItem')}}" method="post" class="card-body">
+        {{ form.csrf_token }}
+        <div class="form-group mb-3">
+            {{ form.name(class_="form-control",placeholder="Name")}}
+        </div>
+        <div class="form-group mb-3">
+            {{ form.price(class_="form-control",placeholder="Price")}}
+        </div>
+        <div class="form-group mb-3">
+            {{ form.description(class_="form-control",placeholder="Description")}}
+        </div>
+        <div class="form-group mb-3">
+            {{ form.image(class_="form-control")}}
+        </div>
+        <div class="d-grid gap-2">
+            <button
+                    type="submit"
+                    class="btn btn-block btn-primary mb-3 btn-info"
+                    name="button"
+                    value="newitem"
+            >Create
+            </button>
+        </div>
+    </form>
+    <form method="post">
+        {{ form.csrf_token }}
+        <select name=attribute multiple style="margin:50px;padding:50px;width:700px;">
+            {% for attribute in attlist%}
+                <option value="{{ attribute }}" name="attribute">{{ attribute[0] }}</option>
+            {% endfor %}
+        </select>
+        <button
+                type="submit"
+                class="btn btn-block btn-primary mb-3 btn-info"
+                name="button"
+                value="selectattribute"
+        >Select Attribute
+        </button>
+    </form>
+    <form method="post">
+        {{ form.csrf_token }}
+        <ul style="color:lightgrey">
+            {% for attribute in selctedattlist%}
+            <script>echo attribute</script>
+            <li name="list" id="{{selctedattlist.index(attribute)}}" value="{{attributevaluelist}}">
+                {{attribute}} {{attvalform.attributevalue(class_="form-control")}}
+            </li>
+            {% endfor %}
+        </ul>
+        <button
+                type="submit"
+                class="btn btn-block btn-primary mb-3 btn-info"
+                name="button"
+                value="createvalue"
+        >Set Value
+        </button>
+    </form>
+    <div>
+        <ul
+        style="color:lightgrey">
+            {% for value in attributevalue%}
+            <li>
+                 {{selctedattlist[attributevalue.index(value)]}} = {{value}}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <form method="post">
+        {{ form.csrf_token }}
+        {{ attform.attributename(class_="form-control",placeholder="New Attribute") }}
+        <button
+                type="submit"
+                class="btn btn-block btn-primary mb-3 btn-info"
+                name="button"
+                value="createattribute"
+        >Create Attribute
+        </button>
+    </form>
+</body>
+{% endblock %}

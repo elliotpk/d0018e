@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash ,request
+from flask import Flask, render_template, redirect, url_for, flash ,request, session
 from flask_bcrypt import Bcrypt
 from flask_login import (
     UserMixin,
@@ -39,18 +39,15 @@ def admin():
     if(current_user.user_type != 'A'):
         flash("Unauthorized access", "danger")
         return redirect(url_for('home'))
-    form = addItem_form()
-    if form.validate_on_submit():
-        try:
-            name = form.name.data
-            image = form.image.data
-            price = form.price.data
-            description = form.description.data
-            attid="hej"
-            createItems(name,image,price,description,attid)
-        except Exception as e:
-            flash(e)
-    return render_template("admin.html", form=form) #Här är error vet inte vad som saknas
+    try:
+        print(session)
+        session['attributevalue']=[]
+        session['selctedattlist']=[]
+    except Exception as e:
+        print(e)
+    form = addItem_form
+    return render_template("admin.html", form=form)
+
 
 @app.route('/admin/addItem/', methods=("GET","POST"))
 @login_required
@@ -59,16 +56,70 @@ def addItem():
         flash("Unauthorized access", "danger")
         return redirect(url_for('home'))
     form = addItem_form()
-    if form.validate_on_submit():
-        try:
-            name = form.name
-            image = form.image
-            price = form.price
-            description = form.description
-            createItems(name,image,price,description)
-        except Exception as e:
-            flash(e)
-    return render_template("admin.html", form=form)
+    attform = addAttribute_form()
+    attvalform = addAttributeValue_form()
+    try:
+        selctedattlist = session['selctedattlist']
+    except:
+        session['selctedattlist'] = selctedattlist=[]
+    try:
+        attributevalue=session['attributevalue']
+    except:
+        session['attributevalue'] = attributevalue = []
+    try:
+        action = request.form['button']
+    except Exception as e:
+        action = None
+    if action == 'newitem':
+        if form.validate_on_submit():
+            try:
+                name = form.name.data
+                image = form.image.data
+                price = form.price.data
+                description = form.description.data
+                if image == "":
+                    image = "None"
+                if description  == "":
+                    description  = "None"
+                id=createItems(name,image,price,description)
+                attributevalue = request.form.getlist('attribute')
+                createAttributeValue(attributevalue, request.form.getlist('selctedattlist'),id)
+                session.popitem('selctedattlist')
+                session.popitem('attributevalue')
+            except Exception as e:
+                flash(e)
+    elif action == 'createattribute':
+        if attform.validate_on_submit():
+            try:
+                attributename = attform.attributename.data
+                createAttribute(attributename)
+            except Exception as e:
+                print(e)
+    elif action == 'createvalue':
+        if attvalform.validate_on_submit():
+            try:
+                if request.form.getlist('attributevalue') != 0:
+                    tre = request.form.getlist('attributevalue')
+                    for x in request.form.getlist('attributevalue'):
+                        attributevalue.append(x)
+                    session['attributevalue']=attributevalue
+                else:
+                    attributevalue=session['attributevalue']
+            except Exception as e:
+                print(e)
+    elif action == 'selectattribute':
+        if len(request.form.getlist('attribute')) != 0:
+            data = request.form.getlist('attribute')
+            for x in range(len(data)):
+                data[x]=data[x].split("('")[1].split("',)")[0]
+                selctedattlist = data
+            session['selctedattlist']=selctedattlist
+        else:
+            selctedattlist=session['selctedattlist']
+    attlist = getAttributes()
+    print(session['selctedattlist'],selctedattlist)
+    print(session['attributevalue'],attributevalue)
+    return render_template("addItem.html", form=form, attform=attform, attlist=attlist, attvalform=attvalform, selctedattlist=selctedattlist, attributevalue=attributevalue)
 
 @app.route('/login/', methods=("GET", "POST"))
 def login():

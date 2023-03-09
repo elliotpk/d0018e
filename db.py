@@ -51,9 +51,54 @@ def getItems():
     print(result)
     return result
 
-def createItems(name,price,description,img,attid):
-    print(name,price,description)
-    cursor=mydb.cursor()
-    query="INSERT INTO item (name, image, price, description) VALUES (%s, %s, %s, %s)"
-    cursor.execute(query,(name,img,price,description))
-    mydb.commit()
+def createItems(name,img,price,description):
+    try:
+        cursor=mydb.cursor()
+        query="INSERT INTO item (name, image, price, description) VALUES (%s, %s, %s, %s)"
+        values = (name,img,int(price),description)
+        cursor.execute(query,values)
+        mydb.commit()
+        query="SELECT id FROM item WHERE name = %s"
+        cursor.execute(query,name)
+        itemid=cursor.fetchone()
+        print(itemid)
+        return itemid
+    except mysql.connector.DatabaseError as e:
+        print(e)
+
+def createAttribute(attname):
+    try:
+        cursor=mydb.cursor()
+        query="INSERT INTO attributes (name) VALUES (%s)"
+        values = ([attname])
+        cursor.execute(query,values)
+        mydb.commit()
+    except Exception as e:
+        print(e,"createa")
+
+def createAttributeValue(attvalue,attid,id):
+    try:
+        cursor=mydb.cursor()
+        query = "SELECT * FROM attributes WHERE name = %s"
+        temp = attid
+        for x in attid:
+            cursor.execute(query,x)
+            temp = cursor.fetchone()[0]
+        query="INSERT INTO attribute_value (value,item:id,attributes:id) VALUES (%s, %s, %s)"
+        for x in attvalue:
+            values = (x,id,temp[x])
+            cursor.execute(query,values)
+            mydb.commit()
+    except Exception as e:
+        print(e,"creatval")
+
+def getAttributes():
+    try:
+        cursor=mydb.cursor()
+        query="SELECT DISTINCT `name` FROM attributes"
+        cursor.execute(query)
+        result=cursor.fetchall()
+        return result
+    except Exception as e:
+        print(e,"getatt")
+        return []
