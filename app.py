@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, flash
+from flask import Flask, render_template, redirect, url_for, flash ,request
 from flask_bcrypt import Bcrypt
 from flask_login import (
     UserMixin,
@@ -33,13 +33,42 @@ def account():
     else:
         return redirect(url_for('admin'))
     
-@app.route('/admin/')
+@app.route('/admin/', methods=("GET", "POST"))
 @login_required
 def admin():
     if(current_user.user_type != 'A'):
         flash("Unauthorized access", "danger")
         return redirect(url_for('home'))
-    return render_template("admin.html")
+    form = addItem_form()
+    if form.validate_on_submit():
+        try:
+            name = form.name.data
+            image = form.image.data
+            price = form.price.data
+            description = form.description.data
+            attid="hej"
+            createItems(name,image,price,description,attid)
+        except Exception as e:
+            flash(e)
+    return render_template("admin.html", form=form)
+
+@app.route('/admin/addItem/', methods=("GET","POST"))
+@login_required
+def addItem():
+    if(current_user.user_type != 'A'):
+        flash("Unauthorized access", "danger")
+        return redirect(url_for('home'))
+    form = addItem_form()
+    if form.validate_on_submit():
+        try:
+            name = form.name
+            image = form.image
+            price = form.price
+            description = form.description
+            createItems(name,image,price,description)
+        except Exception as e:
+            flash(e)
+    return render_template("admin.html", form=form)
 
 @app.route('/login/', methods=("GET", "POST"))
 def login():
@@ -84,6 +113,7 @@ def logout():
 @login_manager.user_loader
 def load_user(user_id):
     return get_user(user_id)
+
 
 if __name__=='__main__':
     app.run()

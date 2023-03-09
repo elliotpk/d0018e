@@ -1,6 +1,32 @@
 {% extends "index.html" %} {% block title %}Admin Page{% endblock %} {% block
 content %}
 
-<!-- Put the content for the <body> here -->
+<body>
+    <form action="{{url_for('admin')}}" method="post" class="card-body">
+        {{ form.csrf_token }}
+        <div class="form-group mb-3">
+            {{ form.name(class_="form-control",placeholder="Name")}}
+        </div>
+        <div class="form-group mb-3">
+            {{ form.price(class_="form-control",placeholder="Price")}}
+        </div>
+        <div class="form-group mb-3">
+            {{ form.description(class_="form-control",placeholder="Description")}}
+        </div>
+        <div class="form-group mb-3">
+            {{ form.image(class_="form-control")}}
+        </div>
+        <div class="d-grid gap-2">
+            <button
+                    type="submit"
+                    class="btn btn-block btn-primary mb-3 btn-info"
+                    name="Create"
+            >Create
+                {{ btn_action }}
+            </button>
+        </div>
+    </form>
+
+</body>
 
 {% endblock %}

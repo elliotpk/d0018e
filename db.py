@@ -50,3 +50,10 @@ def getItems():
     result = cursor.fetchall()
     print(result)
     return result
+
+def createItems(name,price,description,img,attid):
+    print(name,price,description)
+    cursor=mydb.cursor()
+    query="INSERT INTO item (name, image, price, description) VALUES (%s, %s, %s, %s)"
+    cursor.execute(query,(name,img,price,description))
+    mydb.commit()
