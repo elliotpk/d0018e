@@ -127,7 +127,7 @@ def delist(id):
         flash("Unauthorized access", "danger")
         return redirect(url_for('home'))
     itemid = id
-    # TODO Add database connection to delist the item, also make sure to fetch delisted items and display them to the admin
+    toggleVisibility(id)
     return redirect(url_for('home'))
 
 

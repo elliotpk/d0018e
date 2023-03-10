@@ -114,3 +114,9 @@ def getAttributes():
     except Exception as e:
         print(e,"getatt")
         return []
+
+def toggleVisibility(id):
+    cursor = mydb.cursor()
+    query = "UPDATE listing SET active = !active WHERE `item:id` = %s"  # Will flip the boolean value
+    cursor.execute(query, (id,))
+    cursor.close()
