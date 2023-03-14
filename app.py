@@ -24,9 +24,9 @@ bcrypt.init_app(app)
 def home():
     if(current_user.is_authenticated):
         if(current_user.user_type == 'A'):
-            itemdata = getItems('A')
+            itemdata = getItems('A', -1)
         else:
-            itemdata = getItems('U')
+            itemdata = getItems('U', current_user.id)
     else:
         itemdata = getItems('U')
     return render_template('home.html', items = itemdata) # todo: get database info for each item and format properly

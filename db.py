@@ -49,7 +49,7 @@ def validate_email(email):
     cursor.close()
     return result[0][0]                                            # Returns 0 if no user exists with that email
 
-def getItems(usertype):
+def getItems(usertype, userid):
     """Get all active listings for items"""
     cursor=mydb.cursor()
     if(usertype == 'A'):
@@ -58,6 +58,11 @@ def getItems(usertype):
         query="SELECT listing.`date`, item.`name`, item.`image`, item.`price`, item.`id`, item.`description` FROM listing JOIN item WHERE item.`id` = `item:id` AND listing.`active` = 1"
     cursor.execute(query)
     result = cursor.fetchall()
+    if(userid != -1):
+        query = "SELECT `item:id` FROM cart WHERE `user:id` = %s"
+        cursor.execute(query, (userid,))
+        cartIDs = cursor.fetchall()
+        print(cartIDs)
     cursor.close()
     return result
 
@@ -126,7 +131,6 @@ def getItem(id):
     query = "SELECT item.*, attribute_value.`value`, attributes.`name` from item JOIN attribute_value JOIN attributes WHERE `item:id` = %s AND attributes.id = `attributes:id`"
     cursor.execute(query, (id,))
     result = cursor.fetchall()
-    print(result)
     cursor.close()
     return result
 
@@ -134,5 +138,12 @@ def toggleVisibility(id):
     cursor = mydb.cursor()
     query = "UPDATE listing SET `active` = NOT `active` WHERE `item:id` = %s"  # Will flip the boolean value
     cursor.execute(query, (id,))
+    mydb.commit()
+    cursor.close()
+
+def addToCart(userId, itemId):
+    cursor = mydb.cursor()
+    query = "INSERT INTO cart (`user:id`, `item:id`, available) VALUES (%s, %s, %s)"
+    cursor.execute(query, (userId, itemId, 1))
     mydb.commit()
     cursor.close()
