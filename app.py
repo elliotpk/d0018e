@@ -132,7 +132,15 @@ def addItem():
 
 @app.route('/item/<id>', methods=["GET"])
 def item(id):
+    print()
     details = getItem(id)
+    reviews = getComments(id)
+    rating = 0
+    n = 0
+    for i in range(len(reviews)):
+        n += 1
+        rating += reviews[i][3]
+    rating = rating/n
     attributes=[]
     values=[]
     for x in details:
@@ -142,7 +150,7 @@ def item(id):
             values.append(x[6])
     print(attributes)
     print(details)
-    return render_template('item.html', title=details[0][1], image=details[0][2], price = details[0][3], description = details[0][4], attributes = attributes, values=values )
+    return render_template('item.html', title=details[0][1], image=details[0][2], price = details[0][3], description = details[0][4], attributes = attributes, values=values, comments = reviews, rating = rating)
 
 @app.route('/delist/<id>', methods=['POST'])
 @login_required
@@ -229,6 +237,22 @@ def checkout(sum):
             removeFromCart(current_user.id,itemid)
         return redirect(url_for('home'))
     return render_template("checkout.html",form=form,sum=sum)
+
+@app.route('/item/<itemId>/comment', methods=["GET", "POST"])
+@login_required
+def addComment(itemId):
+    form = comment_form()
+    if form.validate_on_submit():
+        try:
+            userId = current_user.id
+            text = form.text.data
+            rating = form.rating.data
+            postComment(itemId, userId, rating, text)
+            return redirect(url_for('item', id=itemId))
+        except Exception as e:
+            flash(e, "danger")
+    return render_template("comment.html", form=form, text='Add comment')
+
 
 @app.route('/logout/', methods=("GET", "POST"))
 @login_required

@@ -212,3 +212,18 @@ def getItemIdsFromOrder(orderId):
             result[itemid]=result[itemid][0]
         itemids.append(result)
     return itemids
+
+def postComment(itemId, userId, rating, txt):
+    cursor = mydb.cursor()
+    query = "INSERT INTO comment (`text`, `user:id`, `rating`, `listing:id`) VALUES (%s, %s, %s, (SELECT `id` FROM listing WHERE `item:id` = %s))"
+    cursor.execute(query, (txt, userId, rating, itemId))
+    mydb.commit()
+    cursor.close()
+
+def getComments(itemId):
+    cursor = mydb.cursor()
+    query = "SELECT * FROM comment WHERE `listing:id` IN (SELECT `id` FROM listing WHERE `item:id` = %s)"
+    cursor.execute(query, (itemId,))
+    result = cursor.fetchall()
+    cursor.close()
+    return result

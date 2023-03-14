@@ -1,10 +1,10 @@
 {% extends "index.html" %} {% block title %} {{ title }} {% endblock %} {% block
 content %}
 
-<div class="container">
-  <div class="card mb-3 mt-1 border border-dark">
+<div class="container-sm">
+  <div class="card card-block mb-3 mt-1 border border-dark">
     <div class="row">
-      <div class="col ">
+      <div class="col">
         <img
           class="card-img-left border border-dark mw-100 mh-100"
           src="https://s.fotorama.io/1.jpg"
@@ -14,10 +14,13 @@ content %}
       <div class="col">
         <div class="card-body">
           <h2>{{ title }}</h2>
+          <p>Rating: {{ rating }}/10</p>
           <p>{{description}}</p>
           <div class="list-group list-group-flush">
             {% for attribute in attributes %}
-            <li class="list-group-item"> {{ attribute }} : {{ values[attributes.index(attribute)]  }} </li>
+            <li class="list-group-item">
+              {{ attribute }} : {{ values[attributes.index(attribute)] }}
+            </li>
             {% endfor %}
           </div>
         </div>
@@ -25,12 +28,30 @@ content %}
           class="card-body d-inline-flex justify-content-between align-items-center align-self-end"
         >
           <a href="#" class="btn btn-info border-dark">Add to cart</a>
-          <h4 class="card-text ms-5"> {{ price }}SEK</h4>
-          </div>
-        </div>
+          <h4 class="card-text ms-5">{{ price }} SEK</h4>
+        
+        <form action="{{url_for('addComment', itemId=request.view_args['id'])}}" method="POST">
+          <button type="submit" class="btn btn-default border-dark ms-5">
+            <span class="material-icons">add_comment</span>
+          </button>
+        </form>
+      </div>
       </div>
     </div>
   </div>
-
-  {% endblock %}
 </div>
+<div class="container">
+  <div class="row">
+    {% for comment in comments %}
+    <div class="col-lg-6 mb-4">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">User: {{comment.2}}   | Rating: {{comment.3}}/10</h4>
+          <p class="card-text">{{comment.1}}</p>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

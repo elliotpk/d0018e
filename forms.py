@@ -8,7 +8,7 @@ from wtforms import (
     FileField,
 )
 from flask_wtf import FlaskForm
-from wtforms.validators import InputRequired, Optional, Email, Length, EqualTo
+from wtforms.validators import InputRequired, Optional, Email, Length, EqualTo, NumberRange
 
 class login_form(FlaskForm):
     email = StringField(validators=[Optional(), Email()])
@@ -37,3 +37,6 @@ class cardCredential_form(FlaskForm):
     expdate=StringField(validators=[InputRequired()])
     cvs=StringField(validators=[InputRequired(), Length(3,3)])
 
+class comment_form(FlaskForm):
+    text = StringField(validators=[Optional(), Length(0,300)])
+    rating = IntegerField(validators=[InputRequired(), NumberRange(0,10)])
