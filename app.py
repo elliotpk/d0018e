@@ -135,12 +135,8 @@ def item(id):
     print()
     details = getItem(id)
     reviews = getComments(id)
-    rating = 0
-    n = 0
-    for i in range(len(reviews)):
-        n += 1
-        rating += reviews[i][3]
-    rating = rating/n
+    rating = sum(i for _,_,_,i,_,_ in reviews)                  # Sum up the review numbers
+    rating = len(reviews) and rating/len(reviews) or 0          # Get the average number or 0 if no reviews exist
     attributes=[]
     values=[]
     for x in details:
