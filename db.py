@@ -61,10 +61,16 @@ def getItems(usertype, userid):
     if(userid != -1):
         query = "SELECT `item:id` FROM cart WHERE `user:id` = %s"
         cursor.execute(query, (userid,))
-        cartIDs = cursor.fetchall()
-        print(cartIDs)
+        cartIds = cursor.fetchall()
     cursor.close()
-    return result
+    newResult = []         
+    for item in result:
+        for itemId in cartIds:
+            if(item[4] == itemId[0]):
+                item += (1,)
+        if(len(item) != 7): item += (0,)
+        newResult.append(item)
+    return newResult
 
 def createItems(name,img,price,description):
     try:
@@ -145,5 +151,12 @@ def addToCart(userId, itemId):
     cursor = mydb.cursor()
     query = "INSERT INTO cart (`user:id`, `item:id`, available) VALUES (%s, %s, %s)"
     cursor.execute(query, (userId, itemId, 1))
+    mydb.commit()
+    cursor.close()
+
+def removeFromCart(userId, itemId):
+    cursor = mydb.cursor()
+    query = "DELETE FROM cart WHERE `user:id` = %s AND `item:id` = %s"
+    cursor.execute(query, (userId, itemId))
     mydb.commit()
     cursor.close()

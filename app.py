@@ -172,6 +172,18 @@ def register():
 
     return render_template('login.html', form=form, text='Register', btn_action='Submit')
 
+@app.route('/cart_add/<itemid>', methods=["POST"])
+@login_required
+def cartAdd(itemid):
+    addToCart(current_user.id, itemid)
+    return redirect(url_for('home'))
+
+@app.route('/cart_remove/<itemid>', methods=["POST"])
+@login_required
+def cartRemove(itemid):
+    removeFromCart(current_user.id, itemid)
+    return redirect(url_for('home'))
+
 @app.route('/logout/', methods=("GET", "POST"))
 @login_required
 def logout():
