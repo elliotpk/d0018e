@@ -133,33 +133,6 @@ def getAttributes():
         print(e,"getatt")
         return []
 
-def getItems(usertype, userid):
-    """Get all active listings for items"""
-    cursor=mydb.cursor()
-    if(usertype == 'A'):
-        query="SELECT listing.`date`, item.`name`, item.`image`, item.`price`, item.`id`, item.`description`, listing.`active` FROM listing JOIN item WHERE item.`id` = `item:id`"   # can remove listing.`item:id` from select
-    else:
-        query="SELECT listing.`date`, item.`name`, item.`image`, item.`price`, item.`id`, item.`description` FROM listing JOIN item WHERE item.`id` = `item:id` AND listing.`active` = 1"
-    cursor.execute(query)
-    result = cursor.fetchall()
-    if(userid != -1):
-        query = "SELECT `item:id` FROM cart WHERE `user:id` = %s"
-        cursor.execute(query, (userid,))
-        cartIds = cursor.fetchall()
-    else:
-        query = "SELECT `item:id` FROM cart"
-        cursor.execute(query)
-        cartIds = cursor.fetchall()
-    cursor.close()
-    newResult = []
-    for item in result:
-        for itemId in cartIds:
-            if(item[4] == itemId[0]):
-                item += (1,)
-        if(len(item) != 7): item += (0,)
-        newResult.append(item)
-    return newResult
-
 def getItem(id):
     cursor = mydb.cursor()
     #query = "SELECT item.*, attribute_value.`value`, attributes.`name` from item JOIN attribute_value JOIN attributes WHERE `item:id` = %s AND attributes.id = `attributes:id`"
