@@ -100,7 +100,7 @@
             </li>
             {% if current_user.user_type == 'U' %}
             <li class="nav-item">
-              <a class="nav-link" href="#"
+              <a class="nav-link" href="{{url_for('cart')}}"
                 ><span class="material-icons align-middle">shopping_cart</span
                 >{{ current_user.cart_size }}</a
               >

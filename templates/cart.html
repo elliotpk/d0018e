@@ -3,7 +3,6 @@ content %}
 
 <body>
     <div class="float-container" style="border-style:solid;border-color:black;display: block;">
-        <h2 style="color:white">Order historik</h2>
         {% for item in itemlist %}
         <div class="card card-block col-sm-3 mt-1 ms-1 border border-dark"
              style="margin-right:10px;width:400px;float: left;">
@@ -14,7 +13,7 @@ content %}
             />
             <div class="card-body">
                 <h5 class="card-title">
-                    <a href="{{url_for('item', id=item[0][0])}}">{{ item[0][1] }}</a>
+                    <a href="{{url_for('item', id=item[0][1])}}">{{ item[0][1] }}</a>
                 </h5>
                 <p class="card-text"><small class="text-muted">{{ item[0][1] }}</small></p>
                 <p class="card-text">{{ item[0][4] }}</p>
@@ -22,6 +21,19 @@ content %}
             </div>
         </div>
         {% endfor %}
+
+
+        <div style="background-color: lightblue;color:white:color:white;border-style:solid;border-color:black;border-radius: 20px;clear:both">
+            {% for item in itemlist %}
+            <h4> {{ item[0][3] }} SEK</h4>
+            {% endfor %}
+            <h3>Summa: {{sum}} SEK</h3>
+            <form method="post" action="{{url_for('checkout',sum=sum)}}">
+                <button value="Köp" name="Köp" type="submit"
+                        style="float:right;padding: 7px;margin: 7px;border-radius: 12px;background-color: lightblue;color:black;;clear:both;width:200px">Köp
+                </button>
+            </form>
+        </div>
     </div>
 </body>
 

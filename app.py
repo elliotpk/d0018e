@@ -28,17 +28,24 @@ def home():
         else:
             itemdata = getItems('U', current_user.id)
     else:
-        itemdata = getItems('U')
+        itemdata = getItems('U',1)
     return render_template('home.html', items = itemdata) # todo: get database info for each item and format properly
 
 @app.route('/account/')
 @login_required
 def account():
     if(current_user.user_type == 'U'):
-        return render_template("account.html")
+        orderid = getOrder(current_user.id)
+        itemids = getItemIdsFromOrder(orderid)
+        itemlist1 = []
+        for x in itemids:
+            for id in x:
+                itemlist1.append(getItem(id))
+        print(itemlist1)
+        return render_template("account.html", methods=("GET","POST"),itemlist=itemlist1)
     else:
         return redirect(url_for('admin'))
-    
+
 @app.route('/admin/', methods=("GET", "POST"))
 @login_required
 def admin():
@@ -125,7 +132,16 @@ def addItem():
 @app.route('/item/<id>', methods=["GET"])
 def item(id):
     details = getItem(id)
-    return render_template('item.html', title=details[0][1], price = details[0][3], attributes = details)
+    attributes=[]
+    values=[]
+    for x in details:
+        if x[9]!=None:
+            attributes.append(x[9])
+        if x[6] != None:
+            values.append(x[6])
+    print(attributes)
+    print(details)
+    return render_template('item.html', title=details[0][1], image=details[0][2], price = details[0][3], description = details[0][4], attributes = attributes, values=values )
 
 @app.route('/delist/<id>', methods=['POST'])
 @login_required
@@ -184,11 +200,42 @@ def cartRemove(itemid):
     removeFromCart(current_user.id, itemid)
     return redirect(url_for('home'))
 
+@app.route('/cart/', methods=("GET", "POST"))
+@login_required
+def cart():
+    itemlist=[]
+    itemidlist=getCart(current_user.id)
+    sum=0
+    for x in itemidlist:
+        data=getItem(x)
+        itemlist.append(data)
+        sum = sum + int(data[0][3])
+    return render_template("cart.html", itemlist=itemlist, sum=sum)
+
+@app.route('/checkout/<sum>', methods=["POST"])
+@login_required
+def checkout(sum):
+    form=cardCredential_form()
+    if form.validate_on_submit():
+        banknr=form.banknr
+        expdate=form.expdate
+        cvs=form.cvs
+        itemidlist = getCart(current_user.id)
+        orderid = userToOrder(current_user.id, sum)
+        for itemid in itemidlist:
+            orderToItem(orderid,itemid)
+            toggleVisibility(itemid)
+            removeFromCart(current_user.id,itemid)
+        return redirect(url_for('home'))
+    return render_template("checkout.html",form=form,sum=sum)
+
 @app.route('/logout/', methods=("GET", "POST"))
 @login_required
 def logout():
     logout_user()
     return render_template("home.html")
+
+
 
 @login_manager.user_loader
 def load_user(user_id):

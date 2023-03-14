@@ -49,29 +49,6 @@ def validate_email(email):
     cursor.close()
     return result[0][0]                                            # Returns 0 if no user exists with that email
 
-def getItems(usertype, userid):
-    """Get all active listings for items"""
-    cursor=mydb.cursor()
-    if(usertype == 'A'):
-        query="SELECT listing.`date`, item.`name`, item.`image`, item.`price`, item.`id`, item.`description`, listing.`active` FROM listing JOIN item WHERE item.`id` = `item:id`"   # can remove listing.`item:id` from select
-    else:
-        query="SELECT listing.`date`, item.`name`, item.`image`, item.`price`, item.`id`, item.`description` FROM listing JOIN item WHERE item.`id` = `item:id` AND listing.`active` = 1"
-    cursor.execute(query)
-    result = cursor.fetchall()
-    if(userid != -1):
-        query = "SELECT `item:id` FROM cart WHERE `user:id` = %s"
-        cursor.execute(query, (userid,))
-        cartIds = cursor.fetchall()
-    cursor.close()
-    newResult = []         
-    for item in result:
-        for itemId in cartIds:
-            if(item[4] == itemId[0]):
-                item += (1,)
-        if(len(item) != 7): item += (0,)
-        newResult.append(item)
-    return newResult
-
 def createItems(name,img,price,description):
     try:
         cursor=mydb.cursor(buffered=True)
@@ -105,7 +82,7 @@ def createAttribute(attname):
 
 def createAttributeValue(attvalue,attid,id):
         cursor=mydb.cursor()
-        query = "SELECT id FROM attributes WHERE name = %s"
+        query = "SELECT id FROM attributes WHERE name = %s LIMIT 1"
         query2 = "INSERT INTO attribute_value (value,`item:id`,`attributes:id`) VALUES (%s, %s, %s)"
         tempid=[]
         while(len(attid)>0):
@@ -132,9 +109,40 @@ def getAttributes():
         print(e,"getatt")
         return []
 
+def getItems(usertype, userid):
+    """Get all active listings for items"""
+    cursor=mydb.cursor()
+    if(usertype == 'A'):
+        query="SELECT listing.`date`, item.`name`, item.`image`, item.`price`, item.`id`, item.`description`, listing.`active` FROM listing JOIN item WHERE item.`id` = `item:id`"   # can remove listing.`item:id` from select
+    else:
+        query="SELECT listing.`date`, item.`name`, item.`image`, item.`price`, item.`id`, item.`description` FROM listing JOIN item WHERE item.`id` = `item:id` AND listing.`active` = 1"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    if(userid != -1):
+        query = "SELECT `item:id` FROM cart WHERE `user:id` = %s"
+        cursor.execute(query, (userid,))
+        cartIds = cursor.fetchall()
+    else:
+        query = "SELECT `item:id` FROM cart"
+        cursor.execute(query)
+        cartIds = cursor.fetchall()
+    cursor.close()
+    newResult = []
+    for item in result:
+        for itemId in cartIds:
+            if(item[4] == itemId[0]):
+                item += (1,)
+        if(len(item) != 7): item += (0,)
+        newResult.append(item)
+    return newResult
+
 def getItem(id):
     cursor = mydb.cursor()
-    query = "SELECT item.*, attribute_value.`value`, attributes.`name` from item JOIN attribute_value JOIN attributes WHERE `item:id` = %s AND attributes.id = `attributes:id`"
+    #query = "SELECT item.*, attribute_value.`value`, attributes.`name` from item JOIN attribute_value JOIN attributes WHERE `item:id` = %s AND attributes.id = `attributes:id`"
+    query = "SELECT * FROM item AS t1" \
+            " LEFT JOIN `attribute_value` AS t2 ON t1.id = t2.`item:id`" \
+            " LEFT JOIN `attributes` AS t3 ON t2.`attributes:id` = t3.id" \
+            " WHERE t1.id = %s"
     cursor.execute(query, (id,))
     result = cursor.fetchall()
     cursor.close()
@@ -160,3 +168,50 @@ def removeFromCart(userId, itemId):
     cursor.execute(query, (userId, itemId))
     mydb.commit()
     cursor.close()
+
+def getCart(userId):
+    cursor = mydb.cursor()
+    query = "SELECT `item:id` FROM cart WHERE `user:id` = %s"
+    cursor.execute(query, (userId,))
+    itemids=cursor.fetchall()
+    for item in range(len(itemids)):
+        itemids[item]=itemids[item][0]
+    cursor.close()
+    return itemids
+
+def userToOrder(userId,sum):
+    cursor = mydb.cursor()
+    query = "INSERT INTO `order` (`date`, `user:id`, `sum`) VALUES (%s, %s, %s)"
+    cursor.execute(query,(datetime.now(),userId,sum))
+    mydb.commit()
+    cursor.execute("SELECT LAST_INSERT_ID()")
+    result = cursor.fetchone()
+    orderid = result[0]
+    return orderid
+
+def orderToItem(orderId,itemId):
+    cursor = mydb.cursor()
+    query = "INSERT INTO `order_items` (`item:id`,`order:id`) VALUES (%s, %s)"
+    cursor.execute(query,(itemId,orderId))
+    mydb.commit()
+
+def getOrder(userId):
+    cursor = mydb.cursor()
+    query = "SELECT id FROM `order` WHERE `user:id` = %s"
+    cursor.execute(query,(userId,))
+    result=cursor.fetchall()
+    for orderid in range(len(result)):
+        result[orderid]=result[orderid][0]
+    return result
+
+def getItemIdsFromOrder(orderId):
+    itemids = []
+    cursor = mydb.cursor()
+    query = "SELECT `item:id` FROM `order_items` WHERE `order:id` = %s"
+    for id in orderId:
+        cursor.execute(query,(id,))
+        result=cursor.fetchall()
+        for itemid in range(len(result)):
+            result[itemid]=result[itemid][0]
+        itemids.append(result)
+    return itemids

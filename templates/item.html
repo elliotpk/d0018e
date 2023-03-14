@@ -14,10 +14,10 @@ content %}
       <div class="col">
         <div class="card-body">
           <h2>{{ title }}</h2>
-          <p>{{ attributes.0.4 }}</p>
+          <p>{{description}}</p>
           <div class="list-group list-group-flush">
             {% for attribute in attributes %}
-            <li class="list-group-item"> {{ attribute.6 }} : {{ attribute.5 }} </li>
+            <li class="list-group-item"> {{ attribute }} : {{ values[attributes.index(attribute)]  }} </li>
             {% endfor %}
           </div>
         </div>
