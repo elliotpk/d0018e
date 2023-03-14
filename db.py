@@ -24,8 +24,11 @@ def get_user(email):
         query = "SELECT id, email, hashed_pass, user_type FROM user WHERE id=%s"
         cursor.execute(query, (email,))
         result = cursor.fetchone()
+    query = "SELECT COUNT(*) FROM cart WHERE `user:id` = %s"
+    cursor.execute(query, (result[0],))
+    cart = cursor.fetchone()
     cursor.close()
-    return User(str(result[0]), result[1], result[2], result[3]) if result else None
+    return User(str(result[0]), result[1], result[2], result[3], cart[0]) if result else None
 
 def add_user(user):
     cursor = mydb.cursor()
@@ -46,10 +49,13 @@ def validate_email(email):
     cursor.close()
     return result[0][0]                                            # Returns 0 if no user exists with that email
 
-def getItems():
+def getItems(usertype):
     """Get all active listings for items"""
     cursor=mydb.cursor()
-    query="SELECT listing.`date`, item.`name`, item.`image`, item.`price`, item.`id`, item.`description` FROM listing JOIN item WHERE item.`id` = `item:id` AND listing.`active` = 1"   # can remove listing.`item:id` from select
+    if(usertype == 'A'):
+        query="SELECT listing.`date`, item.`name`, item.`image`, item.`price`, item.`id`, item.`description`, listing.`active` FROM listing JOIN item WHERE item.`id` = `item:id`"   # can remove listing.`item:id` from select
+    else:
+        query="SELECT listing.`date`, item.`name`, item.`image`, item.`price`, item.`id`, item.`description` FROM listing JOIN item WHERE item.`id` = `item:id` AND listing.`active` = 1"
     cursor.execute(query)
     result = cursor.fetchall()
     cursor.close()
@@ -115,8 +121,18 @@ def getAttributes():
         print(e,"getatt")
         return []
 
+def getItem(id):
+    cursor = mydb.cursor()
+    query = "SELECT item.*, attribute_value.`value`, attributes.`name` from item JOIN attribute_value JOIN attributes WHERE `item:id` = %s AND attributes.id = `attributes:id`"
+    cursor.execute(query, (id,))
+    result = cursor.fetchall()
+    print(result)
+    cursor.close()
+    return result
+
 def toggleVisibility(id):
     cursor = mydb.cursor()
-    query = "UPDATE listing SET active = !active WHERE `item:id` = %s"  # Will flip the boolean value
+    query = "UPDATE listing SET `active` = NOT `active` WHERE `item:id` = %s"  # Will flip the boolean value
     cursor.execute(query, (id,))
+    mydb.commit()
     cursor.close()

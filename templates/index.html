@@ -98,7 +98,14 @@
                 ></a
               >
             </li>
-            {% endif %}
+            {% if current_user.user_type == 'U' %}
+            <li class="nav-item">
+              <a class="nav-link" href="#"
+                ><span class="material-icons align-middle">shopping_cart</span
+                >{{ current_user.cart_size }}</a
+              >
+            </li>
+            {% endif %} {% endif %}
             <li class="nav-item">
               {% if current_user.is_authenticated %}
               <a class="nav-link" href="{{url_for('logout')}}"

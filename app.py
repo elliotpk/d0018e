@@ -22,7 +22,13 @@ bcrypt.init_app(app)
 
 @app.route('/')
 def home():
-    itemdata = getItems()
+    if(current_user.is_authenticated):
+        if(current_user.user_type == 'A'):
+            itemdata = getItems('A')
+        else:
+            itemdata = getItems('U')
+    else:
+        itemdata = getItems('U')
     return render_template('home.html', items = itemdata) # todo: get database info for each item and format properly
 
 @app.route('/account/')
@@ -118,7 +124,8 @@ def addItem():
 
 @app.route('/item/<id>', methods=["GET"])
 def item(id):
-    return id
+    details = getItem(id)
+    return render_template('item.html', title=details[0][1], price = details[0][3], attributes = details)
 
 @app.route('/delist/<id>', methods=['POST'])
 @login_required
