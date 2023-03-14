@@ -30,5 +30,10 @@ class addAttribute_form(FlaskForm):
     attributename = StringField(validators=[InputRequired(),Length(0,72)] )
 
 class addAttributeValue_form(FlaskForm):
-    attributevalue = StringField(validators=[InputRequired(), Length(0, 72)])
+    attributevalue = StringField(validators=[InputRequired(), Length(0, 72)],)
+
+class cardCredential_form(FlaskForm):
+    banknr=StringField(validators=[InputRequired(), Length(0, 72)])
+    expdate=StringField(validators=[InputRequired()])
+    cvs=StringField(validators=[InputRequired(), Length(3,3)])
 

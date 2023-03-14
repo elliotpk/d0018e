@@ -1,0 +1,26 @@
+{% extends "index.html" %} {% block title %}Account Page{% endblock %} {% block
+content %}
+
+<body>
+    <form method="post" action="{{url_for('checkout',sum=sum)}}">
+        {{ form.csrf_token }}
+        <div>
+            {{ form.banknr(class_="form-control",placeholder="Kortnummer")}}
+        </div>
+        <div>
+            {{ form.expdate(class_="form-control",placeholder="mm-dd")}}
+        </div>
+        <div>
+            {{ form.cvs(class_="form-control",placeholder="CVS")}}
+        </div>
+        <button
+                type="submit"
+                class="btn btn-block btn-primary mb-3 btn-info"
+                name="button"
+                value="confirm"
+        >
+            Köp
+        </button>
+    </form>
+</body>
+{% endblock %}
