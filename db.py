@@ -63,11 +63,12 @@ def getItems(usertype, userid):
         cursor.execute(query, (userid,))
         cartIds = cursor.fetchall()
     cursor.close()
-    newResult = []         
+    newResult = []
     for item in result:
-        for itemId in cartIds:
-            if(item[4] == itemId[0]):
-                item += (1,)
+        if(userid != -1):
+            for itemId in cartIds:
+                if(item[4] == itemId[0]):
+                    item += (1,)
         if(len(item) != 7): item += (0,)
         newResult.append(item)
     return newResult

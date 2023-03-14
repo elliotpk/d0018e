@@ -28,7 +28,8 @@ def home():
         else:
             itemdata = getItems('U', current_user.id)
     else:
-        itemdata = getItems('U')
+        itemdata = getItems('U', -1)
+    print(itemdata)
     return render_template('home.html', items = itemdata) # todo: get database info for each item and format properly
 
 @app.route('/account/')
