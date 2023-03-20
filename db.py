@@ -145,6 +145,14 @@ def getItem(id):
     cursor.close()
     return result
 
+def getVisibility(id):
+    cursor = mydb.cursor()
+    query = "SELECT active FROM listing WHERE `item:id` = %s"
+    cursor.execute(query,(id,))
+    result = cursor.fetchall()
+    cursor.close()
+    return result[0][0]
+
 def toggleVisibility(id):
     cursor = mydb.cursor()
     query = "UPDATE listing SET `active` = NOT `active` WHERE `item:id` = %s"  # Will flip the boolean value

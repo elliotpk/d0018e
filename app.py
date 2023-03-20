@@ -135,8 +135,9 @@ def item(id):
     print()
     details = getItem(id)
     reviews = getComments(id)
+    visibility = getVisibility(id)
     rating = sum(i for _,_,_,i,_,_ in reviews)                  # Sum up the review numbers
-    rating = len(reviews) and rating/len(reviews) or 0          # Get the average number or 0 if no reviews exist
+    rating = len(reviews) and rating/len(reviews) or '-'          # Get the average number or 0 if no reviews exist
     attributes=[]
     values=[]
     for x in details:
@@ -146,7 +147,7 @@ def item(id):
             values.append(x[6])
     print(attributes)
     print(details)
-    return render_template('item.html', title=details[0][1], image=details[0][2], price = details[0][3], description = details[0][4], attributes = attributes, values=values, comments = reviews, rating = rating)
+    return render_template('item.html', title=details[0][1], image=details[0][2], price = details[0][3], description = details[0][4], attributes = attributes, values=values, comments = reviews, rating = rating, visibility = visibility)
 
 @app.route('/delist/<id>', methods=['POST'])
 @login_required
@@ -156,7 +157,7 @@ def delist(id):
         return redirect(url_for('home'))
     itemid = id
     toggleVisibility(id)
-    return redirect(url_for('home'))
+    return redirect(request.referrer)
 
 
 @app.route('/login/', methods=("GET", "POST"))
