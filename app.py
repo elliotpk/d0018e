@@ -175,6 +175,15 @@ def deleteComment(id):
     deleteReview(id)
     return redirect(request.referrer)    
 
+@app.route('/updateDescription/<id>', methods=['POST'])
+@login_required
+def updateDescription(id):
+    if(current_user.user_type != 'A'):
+        flash("Unauthorized access", "danger")
+        return redirect(request.referrer)
+    updateDesc(id, request.form['val'])
+    return redirect(request.referrer)    
+
 @app.route('/updateAttribute/<id>/<attribute>', methods=['POST'])
 @login_required
 def updateAttribute(id, attribute):
@@ -273,7 +282,6 @@ def addComment(itemId):
         except Exception as e:
             flash(e, "danger")
     return render_template("comment.html", form=form, text='Add comment')
-
 
 
 

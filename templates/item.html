@@ -16,6 +16,15 @@ content %}
           <h2>{{ title }}</h2>
           <p>Rating: {{ rating }}/10</p>
           <p>{{description}}</p>
+          <a href="#Edit{{title}}" class="btn btn-sm border-dark" data-toggle="collapse"><span class="material-icons align-middle">edit</span></a>
+          <div id="Edit{{title}}" class="collapse form-group">
+            <form action="{{ url_for('updateDescription', id=request.view_args['id'])}}" method="POST">
+              <textarea class="form-control" id="value" name="val"></textarea>
+              <button type="submit" class="btn btn-sm border-dark">
+                <span class="material-icons align-middle">sync</span>
+              </button>
+            </form>
+          </div>
           <div class="list-group">
             {% for attribute in attributes %}
             <li class="list-group-item d-flex">

@@ -256,3 +256,10 @@ def deleteReview(commentId):
     cursor.execute(query, (commentId,))
     mydb.commit()
     cursor.close()
+
+def updateDesc(itemId, description):
+    cursor = mydb.cursor()
+    query = "UPDATE item SET `description` = %s WHERE `id` = %s"
+    cursor.execute(query,(description, itemId))
+    mydb.commit()
+    cursor.close()
