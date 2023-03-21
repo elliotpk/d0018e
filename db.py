@@ -30,6 +30,20 @@ def get_user(email):
     cursor.close()
     return User(str(result[0]), result[1], result[2], result[3], cart[0]) if result else None
 
+def getAllUsers():
+    cursor = mydb.cursor()
+    qurey = "SELECT `id`, `email`, `isDeleted` FROM `user`"
+    cursor.execute(qurey)
+    result = cursor.fetchall()
+    return result
+
+def togleUserVisability(id):
+    cursor = mydb.cursor()
+    query = "UPDATE `user` SET `isDeleted` = NOT `isDeleted` WHERE `id` = %s"
+    cursor.execute(query,(id,))
+    mydb.commit()
+    cursor.close()
+
 def add_user(user):
     cursor = mydb.cursor()
     query = "INSERT INTO user (email, hashed_pass) VALUES (%s, %s)"
@@ -202,23 +216,36 @@ def orderToItem(orderId,itemId):
 
 def getOrder(userId):
     cursor = mydb.cursor()
-    query = "SELECT id FROM `order` WHERE `user:id` = %s"
+    query = "SELECT id FROM `order` WHERE `user:id` = %s AND handeld = 1"
     cursor.execute(query,(userId,))
     result=cursor.fetchall()
     for orderid in range(len(result)):
         result[orderid]=result[orderid][0]
     return result
 
+def getAllOrders():
+    cursor = mydb.cursor()
+    query = "SELECT * FROM `order` WHERE `handeld` = 0"
+    cursor.execute(query)
+    result = cursor.fetchall()
+    return result
+
+def updateOrder(orderid):
+    cursor = mydb.cursor()
+    query = "update `order` set handeld = 1 where `id` = %s;"
+    cursor.execute(query,(orderid,))
+    mydb.commit()
+    cursor.close()
+
 def getItemIdsFromOrder(orderId):
-    itemids = []
     cursor = mydb.cursor()
     query = "SELECT `item:id` FROM `order_items` WHERE `order:id` = %s"
+    itemids = []
     for id in orderId:
         cursor.execute(query,(id,))
         result=cursor.fetchall()
-        for itemid in range(len(result)):
-            result[itemid]=result[itemid][0]
-        itemids.append(result)
+        for i in range(len(result)):
+            itemids.append(result[i][0])
     return itemids
 
 def postComment(itemId, userId, rating, txt):

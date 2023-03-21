@@ -1,0 +1,32 @@
+{% extends "index.html" %} {% block title %}Admin Page{% endblock %} {% block
+content %}
+{% for user in users %}
+    <div style="width:400px;padding:7px;margin:7px;color:white;border-style:solid;border-color:lightblue;border-radius:15px;float:left;">
+        {{user[1]}}
+        <div style="float:right;border-style:solid;border-color:lightblue;border-radius:15px;">
+            <img
+                    class="card-img-left border border-dark mw-100 mh-100"
+                    src="https://s.fotorama.io/{{users.index(user)+1}}.jpg"
+                    alt="Card image cap"
+            />
+        </div>
+        <div style="">
+            <form action="{{url_for('removeuser', id=user[0])}}">
+                <button type="submit" class="btn btn-default border-dark ms-5" style="background-color:grey;">
+                    {% if user[2] == 1 %}
+                    <span class="material-icons align-middle">recommend</span>
+                    <p>
+                        unban
+                    </p>
+                    {% else %}
+                    <span class="material-icons align-middle">block</span>
+                    <p>
+                        ban
+                    </p>
+                    {% endif %}
+                </button>
+            </form>
+        </div>
+    </div>
+{% endfor %}
+{% endblock %}

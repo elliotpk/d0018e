@@ -34,7 +34,7 @@ content %}
       <form method="post">
         {{ form.csrf_token }}
         <select name="attribute" class="form-select mb-3" multiple>
-          {% for attribute in attlist%}
+          {% for attribute in attlist %}
           <option value="{{ attribute }}" name="attribute">
             {{ attribute[0] }}
           </option>

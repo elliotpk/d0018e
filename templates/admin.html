@@ -3,15 +3,36 @@ content %}
 
 <body>
     <form action="{{url_for('addItem')}}" method="post" class="card-body">
-        {{ form.csrf_token }}
         <button
+                style="margin:5px"
                 type="submit"
                 class="btn btn-block btn-primary mb-3 btn-info"
-                name="Create"
+                name="button"
+                value="newitem"
         >Create items
-            {{ btn_action }}
         </button>
     </form>
+    <form action="{{url_for('viewusers')}}" method="post" class="card-body">
+        <button
+                style="margin:5px"
+                type="submit"
+                class="btn btn-block btn-primary mb-3 btn-info"
+                name="button"
+                value="users"
+        >Users
+        </button>
+    </form>
+    <form action="{{url_for('orders')}}" method="post" class="card-body">
+        <button
+                style="margin:5px"
+                type="submit"
+                class="btn btn-block btn-primary mb-3 btn-info"
+                name="button"
+                value="orders"
+        >Orders
+        </button>
+    </form>
+
 
 </body>
 

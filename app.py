@@ -36,13 +36,13 @@ def home():
 @login_required
 def account():
     if(current_user.user_type == 'U'):
-        orderid = getOrder(current_user.id)
-        itemids = getItemIdsFromOrder(orderid)
+        orderids = getOrder(current_user.id)
         itemlist1 = []
-        for x in itemids:
-            for id in x:
+        itemids = []
+        itemids.append(getItemIdsFromOrder(orderids))
+        for list in itemids:
+            for id in list:
                 itemlist1.append(getItem(id))
-        print(itemlist1)
         return render_template("account.html", methods=("GET","POST"),itemlist=itemlist1)
     else:
         return redirect(url_for('admin'))
@@ -58,9 +58,51 @@ def admin():
         session['selectedattlist']=[]
     except Exception as e:
         print(e)
-    form = addItem_form
-    return render_template("admin.html", form=form)
+    try:
+        action = request.form["button"]
+    except Exception as e:
+        action = None
+    if action == 'newitem':
+        return render_template("additem.html")
+    elif action == 'users':
+        return render_template("removeuser.html")
+    elif action == 'orders':
+        return render_template("orders.html")
+    return render_template("admin.html")
 
+@app.route('/admin/viewusers/', methods=("GET","POST"))
+@login_required
+def viewusers():
+    result = getAllUsers()
+    return render_template("viewusers.html", users = result)
+
+@app.route('/admin/removeuser/<id>', methods=("GET","POST"))
+@login_required
+def removeuser(id):
+    togleUserVisability(id)
+    return redirect('/admin/viewusers/')
+
+
+@app.route('/admin/orders/', methods=("GET","POST"))
+@login_required
+def orders():
+    orders=getAllOrders()
+    items = []
+    for order in orders:
+        orders[orders.index(order)]=list(order)
+        orders[orders.index(list(order))][2]=get_user(order[2]).email
+        itemids=getItemIdsFromOrder([order[0]])
+        for ids in itemids:
+            items.append(getItem(ids)[0])
+    print(orders)
+    print(items)
+    return render_template("orders.html", items=items, orders=orders)
+
+@app.route('/admin/orders/confirmOrder/<orderid>', methods=("GET","POST"))
+@login_required
+def confirmOrder(orderid):
+    updateOrder(orderid)
+    return redirect('/admin/orders/')
 
 @app.route('/admin/addItem/', methods=("GET","POST"))
 @login_required
