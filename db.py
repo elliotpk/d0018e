@@ -249,3 +249,10 @@ def updateAtt(itemId, attName, value):
     cursor.execute(query, (value, itemId, attName))
     mydb.commit()
     cursor.close()
+
+def deleteReview(commentId):
+    cursor = mydb.cursor()
+    query = "DELETE FROM comment WHERE `id` = %s"
+    cursor.execute(query, (commentId,))
+    mydb.commit()
+    cursor.close()
