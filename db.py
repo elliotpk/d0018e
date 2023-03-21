@@ -235,3 +235,17 @@ def getComments(itemId):
     result = cursor.fetchall()
     cursor.close()
     return result
+
+def deleteAtt(itemId, attName):
+    cursor = mydb.cursor()
+    query = "DELETE FROM attribute_value WHERE `item:id` = %s AND `attributes:id` = (SELECT `id` FROM attributes WHERE attributes.`name` = %s)"
+    cursor.execute(query, (itemId, attName))
+    mydb.commit()
+    cursor.close()
+
+def updateAtt(itemId, attName, value):
+    cursor = mydb.cursor()
+    query = "UPDATE attribute_value SET `value` = %s WHERE `item:id` = %s AND `attributes:id` = (SELECT `id` FROM attributes WHERE attributes.`name` = %s)"
+    cursor.execute(query, (value, itemId, attName))
+    mydb.commit()
+    cursor.close()

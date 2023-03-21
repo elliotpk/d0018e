@@ -144,9 +144,7 @@ def item(id):
         if x[9]!=None:
             attributes.append(x[9])
         if x[6] != None:
-            values.append(x[6])
-    print(attributes)
-    print(details)
+            values.append(x[7])
     return render_template('item.html', title=details[0][1], image=details[0][2], price = details[0][3], description = details[0][4], attributes = attributes, values=values, comments = reviews, rating = rating, visibility = visibility)
 
 @app.route('/delist/<id>', methods=['POST'])
@@ -159,6 +157,23 @@ def delist(id):
     toggleVisibility(id)
     return redirect(request.referrer)
 
+@app.route('/deleteAttribute/<id>/<attribute>', methods=['POST'])
+@login_required
+def deleteAttribute(id, attribute):
+    if(current_user.user_type != 'A'):
+        flash("Unauthorized access", "danger")
+        return redirect(request.referrer)
+    deleteAtt(id, attribute)
+    return redirect(request.referrer)
+
+@app.route('/updateAttribute/<id>/<attribute>', methods=['POST'])
+@login_required
+def updateAttribute(id, attribute):
+    if(current_user.user_type != 'A'):
+        flash("Unauthorized access", "danger")
+        return redirect(request.referrer)
+    updateAtt(id, attribute, request.form['val'])
+    return redirect(request.referrer)
 
 @app.route('/login/', methods=("GET", "POST"))
 def login():
