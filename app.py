@@ -143,7 +143,7 @@ def item(id):
         if x[9]!=None:
             attributes.append(x[9])
         if x[6] != None:
-            values.append(x[6])
+            values.append(x[7])
     print(attributes)
     print(details)
     return render_template('item.html', title=details[0][1], image=details[0][2], price = details[0][3], description = details[0][4], attributes = attributes, values=values, comments = reviews, rating = rating)
