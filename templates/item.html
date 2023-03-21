@@ -16,32 +16,58 @@ content %}
           <h2>{{ title }}</h2>
           <p>Rating: {{ rating }}/10</p>
           <p>{{description}}</p>
-          <a href="#Edit{{title}}" class="btn btn-sm border-dark" data-toggle="collapse"><span class="material-icons align-middle">edit</span></a>
+          {% if current_user.user_type == 'A' %}
+          <a
+            href="#Edit{{title}}"
+            class="btn btn-sm border-dark"
+            data-toggle="collapse"
+            ><span class="material-icons align-middle">edit</span></a
+          >
           <div id="Edit{{title}}" class="collapse form-group">
-            <form action="{{ url_for('updateDescription', id=request.view_args['id'])}}" method="POST">
+            <form
+              action="{{ url_for('updateDescription', id=request.view_args['id'])}}"
+              method="POST"
+            >
               <textarea class="form-control" id="value" name="val"></textarea>
               <button type="submit" class="btn btn-sm border-dark">
                 <span class="material-icons align-middle">sync</span>
               </button>
             </form>
           </div>
+          {% endif %}
           <div class="list-group">
             {% for attribute in attributes %}
             <li class="list-group-item d-flex">
               <p class="p-0 m-0 flex-grow-1">
-              {{ attribute }} : {{ values[attributes.index(attribute)] }}
+                {{ attribute }} : {{ values[attributes.index(attribute)] }}
               </p>
               {% if current_user.user_type == 'A' %}
-              <a href="#Edit{{attribute}}" class="btn btn-sm border-dark" data-toggle="collapse"><span class="material-icons align-middle">edit</span></a>
+              <a
+                href="#Edit{{attribute}}"
+                class="btn btn-sm border-dark"
+                data-toggle="collapse"
+                ><span class="material-icons align-middle">edit</span></a
+              >
               <div id="Edit{{attribute}}" class="collapse form-group">
-                <form action="{{ url_for('updateAttribute', id=request.view_args['id'], attribute=attribute) }}" method="POST">
-                  <input class="form-control" id="value" name="val" type="text">
+                <form
+                  action="{{ url_for('updateAttribute', id=request.view_args['id'], attribute=attribute) }}"
+                  method="POST"
+                >
+                  <input
+                    class="form-control"
+                    id="value"
+                    name="val"
+                    type="text"
+                  />
                   <button type="submit" class="btn btn-sm border-dark">
                     <span class="material-icons align-middle">sync</span>
                   </button>
                 </form>
               </div>
-              <form action="{{ url_for('deleteAttribute', id=request.view_args['id'], attribute=attribute) }}" method="POST">
+              <form
+                action="{{ url_for('deleteAttribute', id=request.view_args['id'], attribute=attribute) }}"
+                method="POST"
+              >
                 <button type="submit" class="btn btn-sm border-dark">
                   <span class="material-icons align-middle">delete</span>
                 </button>
@@ -56,25 +82,30 @@ content %}
         >
           <a href="#" class="btn btn-info border-dark">Add to cart</a>
           <h4 class="card-text ms-5">{{ price }} SEK</h4>
-        {% if current_user.user_type != 'A' %}
-        <form action="{{url_for('addComment', itemId=request.view_args['id'])}}" method="POST">
-          <button type="submit" class="btn btn-default border-dark ms-5">
-            <span class="material-icons align-middle">add_comment</span>
-          </button>
-        </form>
-        {% endif %}
-        {% if current_user.user_type == 'A' %}
-        <form action="{{url_for('delist', id=request.view_args['id'])}}" method="POST">
-          <button type="submit" class="btn btn-default border-dark ms-5">
-            {% if visibility == 1 %}
-            <span class="material-icons align-middle">visibility_off</span>
-            {% else %}
-            <span class="material-icons align-middle">visibility</span>
-            {% endif %}
-          </button>
-        </form>
-        {% endif %}
-      </div>
+          {% if current_user.user_type != 'A' %}
+          <form
+            action="{{url_for('addComment', itemId=request.view_args['id'])}}"
+            method="POST"
+          >
+            <button type="submit" class="btn btn-default border-dark ms-5">
+              <span class="material-icons align-middle">add_comment</span>
+            </button>
+          </form>
+          {% endif %} {% if current_user.user_type == 'A' %}
+          <form
+            action="{{url_for('delist', id=request.view_args['id'])}}"
+            method="POST"
+          >
+            <button type="submit" class="btn btn-default border-dark ms-5">
+              {% if visibility == 1 %}
+              <span class="material-icons align-middle">visibility_off</span>
+              {% else %}
+              <span class="material-icons align-middle">visibility</span>
+              {% endif %}
+            </button>
+          </form>
+          {% endif %}
+        </div>
       </div>
     </div>
   </div>
@@ -85,10 +116,15 @@ content %}
     <div class="col-lg-6 mb-4">
       <div class="card">
         <div class="card-body">
-          <h5 class="card-title">User: {{comment.2}}   | Rating: {{comment.3}}/10</h5>
+          <h5 class="card-title">
+            User: {{comment.2}} | Rating: {{comment.3}}/10
+          </h5>
           <p class="card-text">{{comment.1}}</p>
           {% if current_user.user_type == 'A' %}
-          <form action="{{url_for('deleteComment', id=comment.0)}}" method="POST">
+          <form
+            action="{{url_for('deleteComment', id=comment.0)}}"
+            method="POST"
+          >
             <button type="submit" class="btn btn-default border-dark">
               <span class="material-icons align-middle">delete</span>
             </button>
